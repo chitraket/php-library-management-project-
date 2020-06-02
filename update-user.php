@@ -8,7 +8,8 @@
  else{
 
     include("includes/header.php");
-    include("includes/sidebar.php"); 
+    include("includes/sidebar.php");
+    include("includes/validation.php");
      $paga=44;
     $admin_email=$_SESSION['admin_email'];
     $query_per="select * from librarian_registration where email='$admin_email'";
@@ -41,7 +42,163 @@ if(isset($_GET['user_id'])){
     $subjects=explode(",",$permission);
     $status=$row_edit['status'];
 }
-
+$error_fname="";
+$error_lname="";
+$error_image="";
+$error_contact="";
+$error_email="";
+$error_password="";
+$error_permission="";
+$error_status="";
+$errorresult=true;
+if(isset($_POST['update'])){
+    if(name($_POST['f_name']))
+    {
+        $error_fname = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_fname = "";
+    }
+    if(name($_POST['l_name']))
+    {
+        $error_lname = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_lname = "";
+    }
+    $test_img2=$_FILES['s_img']['name'];
+                
+    if(images($test_img2))
+    {   
+        $error_image="JPEG or PNG file.";
+        $errorresult=false;
+    }
+    else{
+        $error_image="";
+    }
+    if(contacts($_POST['s_contact']))
+    {
+        $error_contact = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_contact = "";
+    }
+    if(email($_POST['s_email']))
+    {
+        $error_email = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_email = "";
+    }
+    if(pass($_POST['s_password']))
+    {
+        $error_password = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_password = "";
+    }
+    if(empty($_POST['subject']))
+    {
+        $error_permission = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_permission = "";
+    }
+    if(empty($_POST['customRadios']))
+    {
+        $error_status = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_status = "";
+    }
+    if($errorresult==false)
+    {
+        goto end;
+    }
+    $user_id=$_GET['user_id'];
+    $f_name=$_POST['f_name'];
+    $l_name=$_POST['l_name'];
+    $a=$_POST['subject'];
+    $per=implode(",",$a);
+    $img = $_FILES['s_img']['name'];
+    $s_email=$_POST['s_email'];
+    $s_contact=$_POST['s_contact'];
+    $s_password=$_POST['s_password'];
+    $statuss=$_POST['customRadios'];
+    if(!($img==""))
+    {
+    $temp_name1 = $_FILES['s_img']['tmp_name'];
+    move_uploaded_file($temp_name1,"admin_images/$img");
+        $update_p_cat = "update librarian_registration set firstname='$f_name',lastname='$l_name',password='$s_password',email='$s_email',images='$img',contact='$s_contact',roles='sub',permission='$per',status='$statuss' where id='$user_id'";
+      
+        $run_p_cat = mysqli_query($con,$update_p_cat);
+        if($run_p_cat){
+          ?>
+          <script>
+              swal({
+                  title:"Your User Has Been Updated",
+                  text: "",
+                  icon: "success",
+                  buttons: [,"OK"],
+                  successMode: true,
+                 
+          })
+          .then((willDelete) => {
+                  if (willDelete) {
+                      window.open('view-user.php','_self');
+                  } 
+                  else {
+                  }
+          });
+      </script>
+            <?php
+      
+      }
+    }
+      else{
+        $update_p_cat = "update librarian_registration set firstname='$f_name',lastname='$l_name',password='$s_password',email='$s_email',contact='$s_contact',roles='sub',permission='$per',status='$statuss' where id='$user_id'";
+      
+        $run_p_cat = mysqli_query($con,$update_p_cat);
+        if($run_p_cat){
+          ?>
+          <script>
+              swal({
+                  title:"Your User Has Been Updated",
+                  text: "",
+                  icon: "success",
+                  buttons: [,"OK"],
+                  successMode: true,
+                 
+          })
+          .then((willDelete) => {
+                  if (willDelete) {
+                      window.open('view-user.php','_self');
+                  } 
+                  else {
+                  }
+          });
+      </script>
+            <?php
+      
+      }
+      }
+      
+  }
+  end :
 ?>
 <div class="main-content">
 
@@ -61,24 +218,27 @@ if(isset($_GET['user_id'])){
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                       <form method="POST" enctype="multipart/form-data"> 
+                       <form class="custom-validation" method="POST" enctype="multipart/form-data"> 
                        <div class="form-group row">
                                 <label for="example-text-input" class="col-md-3 col-form-label">First Name</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="First Name" name="f_name" value="<?php echo $firstname; ?>"  id="example-text-input">
+                                    <input class="form-control" type="text" placeholder="First Name" name="f_name" value="<?php echo $firstname; ?>"  id="example-text-input" required data-parsley-pattern="/^[A-Za-z ]*$/">
+                                    <span style="color: red;"><?php echo $error_fname?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-text-input" class="col-md-3 col-form-label">Last Name</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="Last Name" name="l_name" value="<?php echo $lastname; ?>"  id="example-text-input">
+                                    <input class="form-control" type="text" placeholder="Last Name" name="l_name" value="<?php echo $lastname; ?>"  id="example-text-input" required data-parsley-pattern="/^[A-Za-z ]*$/">
+                                    <span style="color: red;"><?php echo $error_lname?></span>
                                 </div>
                             </div>     
                             <div class="form-group row">
                                 <label for="example-tel-input" class="col-md-3 col-form-label">Image</label>
                                 <div class="col-md-9">
                                 <div class="custom-file">
-                                            <input type="file" name="s_img" class="custom-file-input" id="customFilewas">
+                                            <input type="file" name="s_img" class="custom-file-input" id="customFilewas" accept=".jpg,.jpeg,.png">
+                                            <span style="color: red;"><?php echo $error_image?></span>
                                             <label class="custom-file-label" id="customFileswas">Choose file</label>
                                             <br>
                                             <br/>
@@ -105,19 +265,22 @@ if(isset($_GET['user_id'])){
                             <div class="form-group row">
                                 <label for="example-password-input" class="col-md-3 col-form-label">Email</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="Email" value="<?php echo $email; ?>" id="example-password-input" name="s_email">
+                                    <input class="form-control" type="email" placeholder="Email" value="<?php echo $email; ?>" id="example-password-input" name="s_email" required>
+                                    <span style="color: red;"><?php echo $error_email?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-password-input" class="col-md-3 col-form-label">Contact</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="Email" value="<?php echo $contact; ?>" id="example-password-input" name="s_contact">
+                                    <input class="form-control" type="number" placeholder="Contact" value="<?php echo $contact; ?>" id="example-password-input" name="s_contact" required data-parsley-pattern="/^[9876][0-9]{9}$/">
+                                    <span style="color: red;"><?php echo $error_contact?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-password-input" class="col-md-3 col-form-label">Password</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="password" placeholder="Password"  value="<?php echo $password; ?>" id="example-password-input" name="s_password">
+                                    <input class="form-control" type="password" placeholder="Password"  value="<?php echo $password; ?>" id="example-password-input" name="s_password" required data-parsley-pattern="/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$/">
+                                    <span style="color: red;"><?php echo $error_password;?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -126,7 +289,7 @@ if(isset($_GET['user_id'])){
                                         
                                         <div class="custom-control custom-checkbox mb-2">
                                         
-                                        <input type="checkbox" class="custom-control-input" id="customCheck1" name="subject[]" value="1" 
+                                        <input type="checkbox" class="custom-control-input" id="customCheck1" name="subject[]" value="1"  required
                                         <?php 
                                         if(in_array(1,$subjects))
                                         {
@@ -167,6 +330,26 @@ if(isset($_GET['user_id'])){
                                             <label class="custom-control-label" for="customCheck4">View Books</label>
                                         </div>
                                         <div class="custom-control custom-checkbox mb-2">
+                                            <input type="checkbox" class="custom-control-input" id="customCheck8" name="subject[]" value="8" 
+                                            <?php 
+                                        if(in_array(8,$subjects))
+                                        {
+                                            echo "checked";
+                                        }
+                                        ?>>
+                                            <label class="custom-control-label" for="customCheck8">Add Category</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox mb-2">
+                                            <input type="checkbox" class="custom-control-input" id="customCheck9" name="subject[]" value="9" 
+                                            <?php 
+                                        if(in_array(9,$subjects))
+                                        {
+                                            echo "checked";
+                                        }
+                                        ?>>
+                                            <label class="custom-control-label" for="customCheck9">View Category</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox mb-2">
                                             <input type="checkbox" class="custom-control-input" id="customCheck5" name="subject[]" value="5" 
                                             <?php 
                                         if(in_array(5,$subjects))
@@ -196,6 +379,7 @@ if(isset($_GET['user_id'])){
                                         ?>>
                                             <label class="custom-control-label" for="customCheck7">Messages</label>
                                         </div>
+                                        <span style="color: red;"><?php echo $error_permission?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -209,7 +393,7 @@ if(isset($_GET['user_id'])){
                                                         <label class="custom-control-label" for="customRadio3">Activate</label>
                                                     </div>
                                                     <div class="custom-control custom-radio mt-2 ml-3">
-                                                        <input type="radio" id="customRadio4" name="customRadios" value="no" class="custom-control-input" checked>
+                                                        <input type="radio" id="customRadio4" name="customRadios" value="no" class="custom-control-input" checked required>
                                                         <label class="custom-control-label" for="customRadio4">Deactivate</label>
                                                     </div>
                             
@@ -219,7 +403,7 @@ if(isset($_GET['user_id'])){
                                     {
                                         ?>
                                                 <div class="custom-control custom-radio mt-2 ml-2">
-                                                        <input type="radio" id="customRadio3" name="customRadios"  value="yes" class="custom-control-input" checked>
+                                                        <input type="radio" id="customRadio3" name="customRadios"  value="yes" class="custom-control-input" checked required>
                                                         <label class="custom-control-label" for="customRadio3">Activate</label>
                                                     </div>
                                                     <div class="custom-control custom-radio mt-2 ml-3">
@@ -229,6 +413,7 @@ if(isset($_GET['user_id'])){
                                                     
                                                     <?php
                                     }?>
+                                    <span style="color: red;"><?php echo $error_status;?></span>
                             </div> 
                             <div class="form-group mt-4">
                                 <div class="text-right">
@@ -314,76 +499,6 @@ $(document).ready(function(){
 </script>
 <?php  
 
-          if(isset($_POST['update'])){
-            $user_id=$_GET['user_id'];
-            $f_name=$_POST['f_name'];
-            $l_name=$_POST['l_name'];
-            $a=$_POST['subject'];
-            $per=implode(",",$a);
-            $img = $_FILES['s_img']['name'];
-            $s_email=$_POST['s_email'];
-            $s_contact=$_POST['s_contact'];
-            $s_password=$_POST['s_password'];
-            $statuss=$_POST['customRadios'];
-            if(!($img==""))
-            {
-            $temp_name1 = $_FILES['s_img']['tmp_name'];
-            move_uploaded_file($temp_name1,"admin_images/$img");
-                $update_p_cat = "update librarian_registration set firstname='$f_name',lastname='$l_name',password='$s_password',email='$s_email',images='$img',contact='$s_contact',roles='sub',permission='$per',status='$statuss' where id='$user_id'";
-              
-                $run_p_cat = mysqli_query($con,$update_p_cat);
-                if($run_p_cat){
-                  ?>
-                  <script>
-                      swal({
-                          title:"Your User Has Been Updated",
-                          text: "",
-                          icon: "success",
-                          buttons: [,"OK"],
-                          successMode: true,
-                         
-                  })
-                  .then((willDelete) => {
-                          if (willDelete) {
-                              window.open('view-user.php','_self');
-                          } 
-                          else {
-                          }
-                  });
-              </script>
-                    <?php
-              
-              }
-            }
-              else{
-                $update_p_cat = "update librarian_registration set firstname='$f_name',lastname='$l_name',password='$s_password',email='$s_email',contact='$s_contact',roles='sub',permission='$per',status='$statuss' where id='$user_id'";
-              
-                $run_p_cat = mysqli_query($con,$update_p_cat);
-                if($run_p_cat){
-                  ?>
-                  <script>
-                      swal({
-                          title:"Your book Has Been Updated",
-                          text: "",
-                          icon: "success",
-                          buttons: [,"OK"],
-                          successMode: true,
-                         
-                  })
-                  .then((willDelete) => {
-                          if (willDelete) {
-                              window.open('view-user.php','_self');
-                          } 
-                          else {
-                          }
-                  });
-              </script>
-                    <?php
-              
-              }
-              }
-              
-          }
  }
 
 else{

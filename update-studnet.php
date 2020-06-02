@@ -8,7 +8,8 @@
  else{
 
     include("includes/header.php");
-     include("includes/sidebar.php"); 
+    include("includes/sidebar.php");
+    include("includes/validation.php");
      $paga=2;
     $admin_email=$_SESSION['admin_email'];
     $query_per="select * from librarian_registration where email='$admin_email'";
@@ -40,7 +41,129 @@ if(isset($_GET['student_id'])){
     $sem=$row_edit['sem'];
     $status=$row_edit['status'];
 }
-
+$error_fname="";
+$error_lname="";
+$error_enrollment="";
+$error_sem="";
+$error_contact="";
+$error_email="";
+$error_password="";
+$error_status="";
+$errorresult=true;
+if(isset($_POST['update'])){
+    if(name($_POST['student_f_name']))
+    {
+        $error_fname = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_fname = "";
+    }
+    if(name($_POST['student_l_name']))
+    {
+        $error_lname = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_lname = "";
+    }
+    if(contacts($_POST['student_contact']))
+    {
+        $error_contact = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_contact = "";
+    }
+    if(email($_POST['student_email']))
+    {
+        $error_email = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_email = "";
+    }
+    if(enrollment($_POST['student_enrollment']))
+    {
+        $error_enrollment = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_enrollment = "";
+    }
+    if(number($_POST['student_sem']))
+    {
+        $error_sem = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_sem = "";
+    }
+    if(pass($_POST['student_password']))
+    {
+        $error_password = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_password = "";
+    }
+    if(empty($_POST['customRadios']))
+    {
+        $error_status="Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_status="";
+    }
+    if($errorresult==false)
+    {
+        goto end;
+    }
+    $student_id=$_GET['student_id'];
+  $studuct_f_name=$_POST['student_f_name'];
+  $student_l_name=$_POST['student_l_name'];
+  $studnet_enrollment=$_POST['student_enrollment'];
+  $studnet_email=$_POST['student_email'];
+  $studnet_sem=$_POST['student_sem'];
+  $student_contact=$_POST['student_contact'];
+  $student_password=$_POST['student_password'];
+  $customRadios=$_POST['customRadios'];
+      $update_p_cat = "update student_registration set firstname='$studuct_f_name',lastname='$student_l_name',password='$student_password',email='$studnet_email',contact='$student_contact',sem='$studnet_sem',enrollment='$studnet_enrollment',status='$customRadios' where id='$student_id'";
+    
+      $run_p_cat = mysqli_query($con,$update_p_cat);
+      if($run_p_cat){
+        ?>
+        <script>
+            swal({
+                title:"Your Student Has Been Updated",
+                text: "",
+                icon: "success",
+                buttons: [,"OK"],
+                successMode: true,
+               
+        })
+        .then((willDelete) => {
+                if (willDelete) {
+                    window.open('view-studnet.php','_self');
+                } 
+                else {
+                }
+        });
+    </script>
+          <?php
+    
+    }
+    
+}
+end :
 ?>
 <div class="main-content">
 
@@ -60,47 +183,54 @@ if(isset($_GET['student_id'])){
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                       <form method="POST" enctype="multipart/form-data"> 
+                       <form class="custom-validation" method="POST" enctype="multipart/form-data"> 
                        <div class="form-group row">
                                 <label for="example-text-input" class="col-md-3 col-form-label">Student Enrollment</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="Student Enrollment" name="student_enrollment" value="<?php echo $enrollment; ?>"  id="example-text-input">
+                                    <input class="form-control" type="number" placeholder="Student Enrollment" name="student_enrollment" value="<?php echo $enrollment; ?>"  id="example-text-input" required data-parsley-pattern="/^[0-9]{15}$/">
+                                    <span style="color: red;"><?php echo $error_enrollment;?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-password-input" class="col-md-3 col-form-label">Student First Name</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="Student First Name" id="example-password-input" value="<?php echo $firstname; ?>" name="student_f_name">
+                                    <input class="form-control" type="text" placeholder="Student First Name" id="example-password-input" value="<?php echo $firstname; ?>" name="student_f_name" required data-parsley-pattern="/^[A-Za-z ]*$/">
+                                    <span style="color: red;"><?php echo $error_fname;?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-password-input" class="col-md-3 col-form-label">Student Last Name</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="Student Last Name" id="example-password-input" value="<?php echo $lastname; ?>" name="student_l_name">
+                                    <input class="form-control" type="text" placeholder="Student Last Name" id="example-password-input" value="<?php echo $lastname; ?>" name="student_l_name" required data-parsley-pattern="/^[A-Za-z ]*$/">
+                                    <span style="color: red;"><?php echo $error_lname;?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-password-input" class="col-md-3 col-form-label">Student Semester</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="Student Semester" id="example-password-input" value="<?php echo $sem; ?>"  name="student_sem">
+                                    <input class="form-control" type="number" placeholder="Student Semester" id="example-password-input" value="<?php echo $sem; ?>"  name="student_sem" required data-parsley-pattern="/^[0-9]*$/">
+                                    <span style="color: red;"><?php echo $error_sem;?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-password-input" class="col-md-3 col-form-label">Student Contact</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="Student Contact" id="example-password-input" value="<?php echo $contact; ?>" name="student_contact">
+                                    <input class="form-control" type="number" placeholder="Student Contact" id="example-password-input" value="<?php echo $contact; ?>" name="student_contact" required data-parsley-pattern="/^[9876][0-9]{9}$/">
+                                    <span style="color: red;"><?php echo $error_contact;?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-password-input" class="col-md-3 col-form-label">Student Email</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="Student Email" id="example-password-input" value="<?php echo $email; ?>" name="student_email">
+                                    <input class="form-control" type="email" placeholder="Student Email" id="example-password-input" value="<?php echo $email; ?>" name="student_email" required>
+                                    <span style="color: red;"><?php echo $error_email;?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-password-input" class="col-md-3 col-form-label">Student Password</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="password" placeholder="Student Password" id="example-password-input" value="<?php echo $password; ?>" name="student_password">
+                                    <input class="form-control" type="password" placeholder="Student Password" id="example-password-input" value="<?php echo $password; ?>" name="student_password" required data-parsley-pattern="/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$/">
+                                    <span style="color: red;"><?php echo $error_password;?></span>
                                 </div>
                             </div>  
                             <div class="form-group row">
@@ -114,7 +244,7 @@ if(isset($_GET['student_id'])){
                                                         <label class="custom-control-label" for="customRadio3">Activate</label>
                                                     </div>
                                                     <div class="custom-control custom-radio mt-2 ml-3">
-                                                        <input type="radio" id="customRadio4" name="customRadios" value="no" class="custom-control-input" checked>
+                                                        <input type="radio" id="customRadio4" name="customRadios" value="no" class="custom-control-input" checked required>
                                                         <label class="custom-control-label" for="customRadio4">Deactivate</label>
                                                     </div>
                             
@@ -124,7 +254,7 @@ if(isset($_GET['student_id'])){
                                     {
                                         ?>
                                                 <div class="custom-control custom-radio mt-2 ml-2">
-                                                        <input type="radio" id="customRadio3" name="customRadios"  value="yes" class="custom-control-input" checked>
+                                                        <input type="radio" id="customRadio3" name="customRadios"  value="yes" class="custom-control-input" checked required>
                                                         <label class="custom-control-label" for="customRadio3">Activate</label>
                                                     </div>
                                                     <div class="custom-control custom-radio mt-2 ml-3">
@@ -134,6 +264,7 @@ if(isset($_GET['student_id'])){
                                                     
                                                     <?php
                                     }?>
+                                    <span style="color: red;"><?php echo $error_status;?></span>
                             </div> 
                             <div class="form-group mt-4">
                                 <div class="text-right">
@@ -219,43 +350,6 @@ $(document).ready(function(){
 </script>
 <?php  
 
-          if(isset($_POST['update'])){
-              $student_id=$_GET['student_id'];
-            $studuct_f_name=$_POST['student_f_name'];
-            $student_l_name=$_POST['student_l_name'];
-            $studnet_enrollment=$_POST['student_enrollment'];
-            $studnet_email=$_POST['student_email'];
-            $studnet_sem=$_POST['student_sem'];
-            $student_contact=$_POST['student_contact'];
-            $student_password=$_POST['student_password'];
-            $customRadios=$_POST['customRadios'];
-                $update_p_cat = "update student_registration set firstname='$studuct_f_name',lastname='$student_l_name',password='$student_password',email='$studnet_email',contact='$student_contact',sem='$studnet_sem',enrollment='$studnet_enrollment',status='$customRadios' where id='$student_id'";
-              
-                $run_p_cat = mysqli_query($con,$update_p_cat);
-                if($run_p_cat){
-                  ?>
-                  <script>
-                      swal({
-                          title:"Your Student Has Been Updated",
-                          text: "",
-                          icon: "success",
-                          buttons: [,"OK"],
-                          successMode: true,
-                         
-                  })
-                  .then((willDelete) => {
-                          if (willDelete) {
-                              window.open('view-studnet.php','_self');
-                          } 
-                          else {
-                          }
-                  });
-              </script>
-                    <?php
-              
-              }
-              
-          }
  }
 
 else{

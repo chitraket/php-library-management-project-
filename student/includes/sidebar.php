@@ -1,6 +1,6 @@
 <?php
  
- if(!isset($_SESSION['admin_email']))
+ if(!isset($_SESSION['student_email']))
  {
      echo "<script>window.open('auth-login.php','_self')</script>";
  } 
@@ -31,9 +31,16 @@
                     <span>Student Information</span>
                 </a>
             </li>
-            <li class="menu-title">Issue Books</li>
+            <li class="menu-title">Books</li>
             <li>
                 <a href="view-book.php" >
+                    <i class="bx bx-task"></i>
+                    <span>Books</span>
+                </a>
+            </li>
+            <li class="menu-title">Issue Books</li>
+            <li>
+                <a href="view-issue.php" >
                     <i class="bx bx-task"></i>
                     <span>Issue Books</span>
                 </a>

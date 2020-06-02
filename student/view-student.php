@@ -1,7 +1,7 @@
 <?php
  session_start();
  include("includes/db.php");
- if(!isset($_SESSION['admin_email']))
+ if(!isset($_SESSION['student_email']))
  {
      echo "<script>window.open('auth-login.php','_self')</script>";
  } 
@@ -10,7 +10,7 @@
     include("includes/header.php");
      include("includes/sidebar.php"); 
     
-     $admin_email=$_SESSION['admin_email'];
+     $admin_email=$_SESSION['student_email'];
 
      ?>
 

@@ -1,7 +1,7 @@
 <?php
  session_start();
  include("includes/db.php");
- if(!isset($_SESSION['admin_email']))
+ if(!isset($_SESSION['student_email']))
  {
      echo "<script>window.open('auth-login.php','_self')</script>";
  } 
@@ -10,7 +10,7 @@
     include("includes/header.php");
      include("includes/sidebar.php"); 
 
-     $admin_email=$_SESSION['admin_email'];
+     $admin_email=$_SESSION['student_email'];
 
      ?>
 
@@ -30,7 +30,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-flex align-items-center justify-content-between">
-                                    <h4 class="mb-0 font-size-18">Issue Books</h4>  
+                                    <h4 class="mb-0 font-size-18">View Books</h4>  
                                 </div>
                             </div>
                         </div>     
@@ -42,13 +42,13 @@
                                         <table id="employee_data" class="table table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                                             <thead>
                                             <tr>
-                                                <th>Enrollment</th>
-                                                <th>Name</th>
-                                                <th>Semester</th>
-                                                <th>Contact</th>
-                                                <th>Email</th>
-                                                <th>Books Name</th>
-                                                <th>Books Issue Date</th>
+                                                <th>Images</th>
+                                                <th>Book Name</th>
+                                                <th>ISBN</th>
+                                                <th>Author Name</th>
+                                                <th>Publication Name</th>
+                                                <th>Publication Date</th>
+                                                <th>Stock</th>
                                             </tr>
                                             </thead>
                                             
@@ -56,18 +56,35 @@
                                             
                                             <?php
                                             
-                                              $select_cat="SELECT * FROM issue_books where books_return_date='' and student_enrollment='$admin_email' ORDER BY id DESC";
+                                              $select_cat="SELECT * FROM add_books where status='yes' ORDER BY id DESC";
                                               $run_cart=mysqli_query($con, $select_cat);
                                             while ($row_cart=mysqli_fetch_array($run_cart)) {
+                                                $date=$row_cart["books_publication_date"]; 
+                                                    $orgDate = $date;  
+                                                    $newDate = date("d-M-Y", strtotime($orgDate));
                                                ?>
                                                 <tr>
-                                                <td><?php echo $row_cart["student_enrollment"] ?></td>
-                                                <td><?php  echo $row_cart['student_name'];?></td>
-                                                <td><?php echo $row_cart['student_sem']; ?></td>
-                                                <td><?php echo $row_cart["student_contact"] ?></td>
-                                                <td><?php echo $row_cart["student_email"] ?></td>
+                                                <td>
+                                                <img src="../book_images/<?php echo $row_cart["books_image"]; ?>" width="50" height="50"></td>
                                                 <td><?php echo $row_cart["books_name"] ?></td>
-                                                <td><?php echo $row_cart["books_issue_date"] ?></td>
+                                                <td><?php echo $row_cart["books_isbn"] ?></td>
+                                                <td><?php  echo $row_cart['books_author_name'];?></td>
+                                                <td><?php echo $row_cart['books_publication_name']; ?></td>
+                                                <td><?php echo $newDate; ?></td>
+                                                <?php
+                                                 if($row_cart['available_qty']==0)
+                                                 {
+                                                     ?>
+                                                     <td><span class="badge badge-pill badge-soft-danger font-size-14" >Unavailable</span></td>
+                                                     <?php
+                                                 }
+                                                 else{
+                                                     ?>
+                                                    <td><span class="badge badge-pill badge-soft-success font-size-14" >Available</span></td>
+                                                 <?php
+                                                 }
+                                                ?>
+
                                                 </tr>
                                                 <?php 
                                                  }?>

@@ -1,7 +1,7 @@
 <?php
  session_start();
  include("includes/db.php");
- if(!isset($_SESSION['admin_email']))
+ if(!isset($_SESSION['student_email']))
  {
      echo "<script>window.open('auth-login.php','_self')</script>";
  } 
@@ -9,18 +9,9 @@
 
     include("includes/header.php");
      include("includes/sidebar.php"); 
-     $paga=2;
-     $admin_email=$_SESSION['admin_email'];
-     $query_per="select * from librarian_registration where email='$admin_email'";
-         $run_query_per=mysqli_query($con,$query_per);
-         while($row_query_per=mysqli_fetch_array($run_query_per))
-         {
-              $admin_permission=$row_query_per['permission'];
-                                     
-         } 
-         $subject=explode(",",$admin_permission);
-        if(in_array($paga,$subject))
-        {
+
+     $admin_email=$_SESSION['student_email'];
+
      ?>
 
             <!-- Left Sidebar End -->
@@ -39,7 +30,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-flex align-items-center justify-content-between">
-                                    <h4 class="mb-0 font-size-18">View Student</h4>  
+                                    <h4 class="mb-0 font-size-18">Issue Books</h4>  
                                 </div>
                             </div>
                         </div>     
@@ -52,13 +43,12 @@
                                             <thead>
                                             <tr>
                                                 <th>Enrollment</th>
-                                                <th>Firstname</th>
-                                                <th>Lastname</th>
-                                                <th>Email</th>
-                                                <th>Contact</th>
+                                                <th>Name</th>
                                                 <th>Semester</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
+                                                <th>Contact</th>
+                                                <th>Email</th>
+                                                <th>Books Name</th>
+                                                <th>Books Issue Date</th>
                                             </tr>
                                             </thead>
                                             
@@ -66,40 +56,18 @@
                                             
                                             <?php
                                             
-                                              $select_cat="SELECT * FROM student_registration ORDER BY 	id DESC";
+                                              $select_cat="SELECT * FROM issue_books where books_return_date='' and student_enrollment='$admin_email' ORDER BY id DESC";
                                               $run_cart=mysqli_query($con, $select_cat);
                                             while ($row_cart=mysqli_fetch_array($run_cart)) {
                                                ?>
                                                 <tr>
-                                                <td><?php echo $row_cart["enrollment"] ?></td>
-                                                <td><?php  echo $row_cart['firstname'];?></td>
-                                                <td><?php echo $row_cart['lastname']; ?></td>
-                                                <td><?php echo $row_cart["email"] ?></td>
-                                                <td><?php echo $row_cart["contact"] ?></td>
-                                                <td><?php echo $row_cart["sem"] ?></td>
-                                                <td>
-                                               <?php 
-                                                if($row_cart['status']=="yes")
-                                                {
-                                                ?>
-                                               
-                                                    <input type="checkbox" id="<?php echo $row_cart['id']; ?>" class="switch1" name="no" switch="none" checked/>
-                                                <label for="<?php echo $row_cart['id']; ?>" data-on-label="On"
-                                                    data-off-label="Off"></label>
-                                                <?php
-                                                }
-                                                else{
-                                                    ?>
-                                                
-                                                    <input type="checkbox" id="<?php echo $row_cart['id']; ?>" class="switch1" name="yes" switch="none" />
-                                                <label for="<?php echo $row_cart['id']; ?>" data-on-label="On"
-                                                    data-off-label="Off"></label>
-                                                
-                                                    <?php 
-                                                } 
-                                                ?>
-                                                </td>
-                                                <td><a href="delete-studnet.php?student_id=<?php echo $row_cart["id"];?>" class="btn-delete"><i class="bx bx-trash font-size-20 align-middle mr-1"></i></a><a href="update-studnet.php?student_id=<?php echo $row_cart["id"];?>" class="pl-2"><i class="bx bx-edit font-size-20 align-middle mr-1"></i></a> </td>
+                                                <td><?php echo $row_cart["student_enrollment"] ?></td>
+                                                <td><?php  echo $row_cart['student_name'];?></td>
+                                                <td><?php echo $row_cart['student_sem']; ?></td>
+                                                <td><?php echo $row_cart["student_contact"] ?></td>
+                                                <td><?php echo $row_cart["student_email"] ?></td>
+                                                <td><?php echo $row_cart["books_name"] ?></td>
+                                                <td><?php echo $row_cart["books_issue_date"] ?></td>
                                                 </tr>
                                                 <?php 
                                                  }?>
@@ -117,14 +85,6 @@
                
                 <!-- Modal -->
 
-                <?php
-                if(isset($_GET['m']))
-                { 
-                ?>
-                <div class="flash-data" data-flashdata="<?php echo $_GET['m'] ?>"></div>
-                <?php
-                } 
-                ?>
                
                 <!-- end modal -->
                 
@@ -197,7 +157,7 @@
                 })
                 .then((willDelete) => {
                         if (willDelete) {
-                            window.open('view-studnet.php','_self');
+                            window.open('view-issue.php','_self');
                         } 
                         else
                         {
@@ -225,87 +185,6 @@
  }, 1000)
         });  
         </script>
-        <script>
-                    $('.switch1').on('click',function(){
-                        var studnet_ids=$(this).attr("id");
-                        var studnet_idss=$(this).attr("name");
-                        $.ajax({
-                            url:"studnet-status.php",
-                            method:"POST",
-                            data:{studnet_ids:studnet_ids,studnet_idss:studnet_idss},
-                            success:function(success)
-                            {
-                                window.open('view-studnet.php','_self');
-                            }
-                        });
-                    });
-        </script> 
-        <script>
-           $('.btn-delete').on('click',function(e){
-               e.preventDefault();
-               const href =$(this).attr('href')
-               swal({
-                        title: "Are you sure?",
-                        text: "Delete Student.",
-                        icon: "warning",
-                        buttons: true,
-                        successMode: true,
-                })
-                .then((willDelete) => {
-                        if (willDelete) {
-                           document.location.href=href;
-                        } else {
-                        
-                        }
-                });
-              
-           })
-           const flashdata=$('.flash-data').data('flashdata')
-           if(flashdata){
-            swal({
-                        title: "successful delete Student.",
-                        text: "",
-                        icon: "success",
-                        buttons: [,"Ok"],
-                        successMode: true,
-                })
-                .then((willDelete) => {
-                        if (willDelete) { 
-                            window.open('view-studnet.php','_self'); 
-                        } else {
-                        
-                        }
-                });
-                
-           }    
-        </script> 
-
-<?php
- }
-
-else{
-    
-    ?>
-    <!-- Sweet Alert-->
-
-    <script>
-    swal({
-        title:"You cannot access this page!",
-        text: "Please contact administrator",
-        icon: "warning",
-        buttons: [,"OK"],
-        successMode: true,
-       
-})
-.then((willDelete) => {
-        if (willDelete) {
-            window.open('index.php','_self');
-        } 
-        else {
+        <?php
         }
-});
-    </script>
-    <?php
-        }
-    }
 ?>

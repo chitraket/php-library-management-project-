@@ -45,6 +45,16 @@
                     <li><a href="view-book.php">View book</a></li>
                 </ul>
             </li>
+            <li>
+                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <i class="bx bx-receipt"></i>
+                    <span>Category</span>
+                </a>
+                <ul class="sub-menu" aria-expanded="false">
+                    <li><a href="add-category.php">Add category</a></li>
+                    <li><a href="view-category.php">View category</a></li>
+                </ul>
+            </li>
 
             <li class="menu-title">Issue Books</li>
             <li>

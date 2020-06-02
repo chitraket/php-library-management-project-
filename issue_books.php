@@ -59,11 +59,11 @@
                            // $manufacturer_accessories_id=$row_accessories_manufacturers['accessories_brand_id'];
                                   $manufacturer_accessories_title = $row_accessories_manufacturers['enrollment'];
                                   
-                                  echo "
+                              ?>  
                                   
-                                  <option value='$manufacturer_accessories_title'> $manufacturer_accessories_title </option>
+                                  <option value='<?php echo  $manufacturer_accessories_title; ?>'> <?php echo $manufacturer_accessories_title; ?> </option>
                                   
-                                  ";
+                              <?php
                                   
                               }
                               
@@ -140,7 +140,7 @@
                                 <select class="form-control select2" name="books_name">
                               <?php 
                               
-                              $get_accessories_manufacturerss = "select * from add_books where status='yes'";
+                              $get_accessories_manufacturerss = "select * from add_books where NOT available_qty='0' AND status='yes' ";
                               $run_accessories_manufacturerss = mysqli_query($con,$get_accessories_manufacturerss);
                               
                               while ($row_accessories_manufacturerss=mysqli_fetch_array($run_accessories_manufacturerss)){
@@ -184,7 +184,6 @@
 
                             $book_name=$_POST['books_name'];
                             $name=$_POST['name'];
-                                //$username=$row["username"];
                                 $email=$_POST["email"];
                                 $contact=$_POST["contact"];
                                 $sem=$_POST["sem"];
@@ -193,6 +192,8 @@
                                 $run_product = mysqli_query($con,$insert_product);
                                 
                                 if($run_product){
+                                    $update_product="update add_books set available_qty=available_qty-1 where books_name='$book_name'";
+                                mysqli_query($con,$update_product);
                                     ?>
                                     <script>
                                         swal({

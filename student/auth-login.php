@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(isset($_SESSION['admin_email']))
+if(isset($_SESSION['student_email']))
 {
     echo "<script>window.open('index.php','_self')</script>";
 }
@@ -50,7 +50,7 @@ include("includes/db.php");
                             </div>
                             <div class="card-body pt-0"> 
                                 <div>
-                                    <a href="index.html">
+                                    <a href="index.php">
                                         <div class="avatar-md profile-user-wid mb-4">
                                             <span class="avatar-title rounded-circle bg-light">
                                                 <img src="assets/images/logo.svg" alt="" class="rounded-circle" height="34">
@@ -59,16 +59,16 @@ include("includes/db.php");
                                     </a>
                                 </div>
                                 <div class="p-2">
-                                    <form class="form-horizontal" action="#" method="POST">
+                                    <form class="form-horizontal custom-validation" class="form-horizontal" action="#" method="POST">
         
                                         <div class="form-group">
                                             <label for="username">Enrollment</label>
-                                            <input type="text" class="form-control" id="username" placeholder="Enter enrollment" name="admin_email">
+                                            <input type="number" class="form-control" id="username" placeholder="Enter enrollment" name="admin_email" required data-parsley-pattern="/^[0-9]{15}$/">
                                         </div>
                 
                                         <div class="form-group">
                                             <label for="userpassword">Password</label>
-                                            <input type="password" class="form-control" id="userpassword" placeholder="Enter password" name="admin_pass">
+                                            <input type="password" class="form-control" id="userpassword" placeholder="Enter password" name="admin_pass" required data-parsley-pattern="(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}">
                                         </div>
                 
                                        
@@ -95,7 +95,7 @@ include("includes/db.php");
                              $count=mysqli_num_rows($run_admin);
                              if($count==1)
                              {
-                                    $_SESSION['admin_email']=$admin_email; 
+                                    $_SESSION['student_email']=$admin_email; 
                                     echo "<script>window.open('index.php','_self')</script>";
                              }
                              else{
@@ -131,8 +131,18 @@ include("includes/db.php");
                 </div>
             </div>
         </div>
+<!-- JAVASCRIPT -->
+<script src="assets/libs/jquery/jquery.min.js"></script>
+        <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="assets/libs/metismenu/metisMenu.min.js"></script>
+        <script src="assets/libs/simplebar/simplebar.min.js"></script>
+        <script src="assets/libs/node-waves/waves.min.js"></script>
 
+        <script src="assets/libs/parsleyjs/parsley.min.js"></script>
+
+        <script src="assets/js/pages/form-validation.init.js"></script>
+
+        <script src="assets/js/app.js"></script>
+        <script src="assets/js/pages/form-validation.init.js"></script>
     </body>
-
-<!-- Mirrored from themesbrand.com/skote/layouts/vertical/auth-login.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 10 Feb 2020 17:43:30 GMT -->
 </html>

@@ -9,6 +9,7 @@
    
     include("includes/header.php");
     include("includes/sidebar.php"); 
+    include("includes/validation.php"); 
     $admin_email=$_SESSION['admin_email'];
     $paga=44;
     $query_per="select * from librarian_registration where email='$admin_email'";
@@ -21,8 +22,125 @@
     $subject=explode(",",$admin_permission);
     if(in_array($paga,$subject))
     {
-            ?>
-      
+           
+$error_fname="";
+$error_lname="";
+$error_image="";
+$error_contact="";
+$error_email="";
+$error_password="";
+$error_permission="";
+$errorresult=true;
+if(isset($_POST['submit'])){
+
+    if(name($_POST['f_name']))
+    {
+        $error_fname = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_fname = "";
+    }
+    if(name($_POST['l_name']))
+    {
+        $error_lname = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_lname = "";
+    }
+    $test_img2=$_FILES['s_img']['name'];
+                
+    if(images($test_img2))
+    {   
+        $error_image="JPEG or PNG file.";
+        $errorresult=false;
+    }
+    else{
+        $error_image="";
+    }
+    if(contacts($_POST['s_contact']))
+    {
+        $error_contact = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_contact = "";
+    }
+    if(email($_POST['s_email']))
+    {
+        $error_email = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_email = "";
+    }
+    if(pass($_POST['s_password']))
+    {
+        $error_password = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_password = "";
+    }
+    if(empty($_POST['subject']))
+    {
+        $error_permission = "Required..";
+        $errorresult=false;
+    }
+    else
+    {
+        $error_permission = "";
+    }
+    if($errorresult==false)
+    {
+        goto end;
+    }
+    $f_name=$_POST['f_name'];
+    $l_name=$_POST['l_name'];
+    $s_img = $_FILES['s_img']['name'];
+    $temp_name1 = $_FILES['s_img']['tmp_name'];
+    move_uploaded_file($temp_name1,"admin_images/$s_img");
+    $s_email=$_POST['s_email'];
+    $s_contact=$_POST['s_contact'];
+    $s_password=$_POST['s_password'];
+    $a=$_POST['subject'];
+    $per=implode(",",$a);
+
+    $insert_product = "insert into librarian_registration(firstname,lastname,password,email,images,contact,roles,permission,status) values('$f_name','$l_name','$s_password','$s_email','$s_img','$s_contact','sub','$per','yes')";
+    $run_product = mysqli_query($con,$insert_product);
+    
+    if($run_product){
+        ?>
+        <script>
+            swal({
+                title:"Your New user Has Been Inserted.",
+                text: "",
+                icon: "success",
+                buttons: [,"OK"],
+                successMode: true,
+               
+        })
+        .then((willDelete) => {
+                if (willDelete) {
+                    window.open('view-user.php','_self');
+                } 
+                else {
+                }
+        });
+    </script>
+    
+    <?php     
+    }
+    
+}
+end:
+?>
             <!-- ========== Left Sidebar Start ========== -->
     
 
@@ -44,24 +162,27 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                       <form method="POST" action="" enctype="multipart/form-data"> 
+                       <form class="custom-validation" method="POST" action="" enctype="multipart/form-data"> 
                             <div class="form-group row">
                                 <label for="example-text-input" class="col-md-3 col-form-label">First Name</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="First name" name="f_name"  id="example-text-input">
+                                    <input class="form-control" type="text" placeholder="First name" name="f_name"  id="example-text-input" required data-parsley-pattern="/^[A-Za-z ]*$/">
+                                    <span style="color: red;"><?php echo $error_fname?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-text-input" class="col-md-3 col-form-label">Last Name</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="Last name" name="l_name"  id="example-text-input">
+                                    <input class="form-control" type="text" placeholder="Last name" name="l_name"  id="example-text-input" required data-parsley-pattern="/^[A-Za-z ]*$/">
+                                    <span style="color: red;"><?php echo $error_lname?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-tel-input" class="col-md-3 col-form-label">Image</label>
                                 <div class="col-md-9">
                                 <div class="custom-file">
-                                            <input type="file" name="s_img" class="custom-file-input" id="customFilewas">
+                                            <input type="file" name="s_img" class="custom-file-input" id="customFilewas" accept=".jpg,.jpeg,.png" required>
+                                            <span style="color: red;"><?php echo $error_image?></span>
                                             <label class="custom-file-label" id="customFileswas">Choose file</label>
                                             <script type="text/javascript">
                                             const realfileBtnwas=document.getElementById("customFilewas");
@@ -83,26 +204,29 @@
                             <div class="form-group row">
                                 <label for="example-password-input" class="col-md-3 col-form-label">Email</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="email" placeholder="Email" id="example-password-input" name="s_email">
+                                    <input class="form-control" type="email" placeholder="Email" id="example-password-input" name="s_email" required >
+                                    <span style="color: red;"><?php echo $error_email?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-password-input" class="col-md-3 col-form-label">Contact</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="Contact" id="example-password-input" name="s_contact">
+                                    <input class="form-control" type="number" placeholder="Contact" id="example-password-input" name="s_contact" required data-parsley-pattern="/^[9876][0-9]{9}$/">
+                                    <span style="color: red;"><?php echo $error_contact?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="example-password-input" class="col-md-3 col-form-label">Password</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="password" placeholder="Password" id="example-password-input" name="s_password">
+                                    <input class="form-control" type="password" placeholder="Password" id="example-password-input" name="s_password" required data-parsley-pattern="/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$/">
+                                    <span style="color: red;"><?php echo $error_password;?></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                             <label for="example-url-input" class="col-md-3 col-form-label">Permission</label>
                                 <div class="col-md-9">
                                         <div class="custom-control custom-checkbox mb-2">
-                                        <input type="checkbox" class="custom-control-input" id="customCheck1" name="subject[]" value="1" >
+                                        <input type="checkbox" class="custom-control-input" id="customCheck1" name="subject[]" value="1" checked  required>
                                         <label class="custom-control-label" for="customCheck1">Add Student</label>
                                         </div>
                                         <div class="custom-control custom-checkbox mb-2">
@@ -118,6 +242,14 @@
                                             <label class="custom-control-label" for="customCheck4">View Book</label>
                                         </div>
                                         <div class="custom-control custom-checkbox mb-2">
+                                            <input type="checkbox" class="custom-control-input" id="customCheck8" name="subject[]" value="8" >
+                                            <label class="custom-control-label" for="customCheck8">Add Category</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox mb-2">
+                                            <input type="checkbox" class="custom-control-input" id="customCheck9" name="subject[]" value="9" >
+                                            <label class="custom-control-label" for="customCheck9">View Category</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox mb-2">
                                             <input type="checkbox" class="custom-control-input" id="customCheck5" name="subject[]" value="5" >
                                             <label class="custom-control-label" for="customCheck5">Issue Book</label>
                                         </div>
@@ -129,7 +261,7 @@
                                             <input type="checkbox" class="custom-control-input" id="customCheck7" name="subject[]" value="7" >
                                             <label class="custom-control-label" for="customCheck7">Messages</label>
                                         </div>
-
+                                        <span style="color: red;"><?php echo $error_permission?></span>
                                 </div>
                             </div>
                             <div class="form-group mt-4">
@@ -158,24 +290,24 @@
     </div>
 </div>
 </div>
-        <!-- JAVASCRIPT -->
         <script src="assets/libs/jquery/jquery.min.js"></script>
         <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
         <script src="assets/libs/metismenu/metisMenu.min.js"></script>
         <script src="assets/libs/simplebar/simplebar.min.js"></script>
         <script src="assets/libs/node-waves/waves.min.js"></script>
 
-         <!-- select 2 plugin -->
-         <script src="assets/libs/select2/js/select2.min.js"></script>
+        <!-- select 2 plugin -->
+        <script src="assets/libs/select2/js/select2.min.js"></script>
         <script src="assets/js/pages/ecommerce-select2.init.js"></script>
+        <script src="assets/libs/parsleyjs/parsley.min.js"></script>
+        <script src="assets/js/pages/form-validation.init.js"></script>
         <!-- apexcharts -->
         <script src="assets/libs/apexcharts/apexcharts.min.js"></script>
 
         <script src="assets/js/pages/dashboard.init.js"></script>
-        
+
         <script src="assets/js/tinymce/tinymce.min.js"></script>
         <script>tinymce.init({ selector:'textarea'});</script>
-
         <script src="assets/js/app.js"></script>
 
         
@@ -230,52 +362,6 @@ $(document).ready(function(){
  }, 1000)
 });
 </script>
-<?php 
-
-if(isset($_POST['submit'])){
-
-    $f_name=$_POST['f_name'];
-    $l_name=$_POST['l_name'];
-    $s_img = $_FILES['s_img']['name'];
-    $temp_name1 = $_FILES['s_img']['tmp_name'];
-    move_uploaded_file($temp_name1,"admin_images/$s_img");
-    $s_email=$_POST['s_email'];
-    $s_contact=$_POST['s_contact'];
-    $s_password=$_POST['s_password'];
-    $a=$_POST['subject'];
-    $per=implode(",",$a);
-
-    $insert_product = "insert into librarian_registration(firstname,lastname,password,email,images,contact,roles,permission,status) values('$f_name','$l_name','$s_password','$s_email','$s_img','$s_contact','sub','$per','yes')";
-    $run_product = mysqli_query($con,$insert_product);
-    
-    if($run_product){
-        ?>
-        <script>
-            swal({
-                title:"Your New user Has Been Inserted.",
-                text: "",
-                icon: "success",
-                buttons: [,"OK"],
-                successMode: true,
-               
-        })
-        .then((willDelete) => {
-                if (willDelete) {
-                    window.open('view-user.php','_self');
-                } 
-                else {
-                }
-        });
-    </script>
-    
-    <?php     
-    }
-    
-}
-
-?>
-
-
     <?php
  }
 

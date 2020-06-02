@@ -230,9 +230,9 @@
                             url:"user-status.php",
                             method:"POST",
                             data:{user_ids:user_ids,user_idss:user_idss},
-                            success:function()
-                            {
-
+                            success:function(success)
+                            {   
+                                window.open('view-user.php','_self')
                             }
                         });
                     });

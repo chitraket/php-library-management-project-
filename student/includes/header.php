@@ -84,7 +84,7 @@
                       
                         <div class="dropdown d-inline-block">
                         <?php
-                       $admin_email=$_SESSION['admin_email'];
+                       $admin_email=$_SESSION['student_email'];
                         $select_cat="select * from student_registration where enrollment='$admin_email'";
                         $run_cart=mysqli_query($con,$select_cat);
                         while ($row_cart=mysqli_fetch_array($run_cart)) {

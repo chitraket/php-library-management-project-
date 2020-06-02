@@ -54,8 +54,6 @@
                                                 <th>Enrollment</th>
                                                 <th>Name</th>
                                                 <th>Semester</th>
-                                                <th>Contact</th>
-                                                <th>Email</th>
                                                 <th>Books Name</th>
                                                 <th>Books Issue Date</th>
                                                 <th>Action</th>
@@ -69,15 +67,16 @@
                                               $select_cat="SELECT * FROM issue_books where books_return_date='' ORDER BY id DESC";
                                               $run_cart=mysqli_query($con, $select_cat);
                                             while ($row_cart=mysqli_fetch_array($run_cart)) {
+                                                $date=$row_cart["books_issue_date"]; 
+                                                    $orgDate = $date;  
+                                                    $newDate = date("d-M-Y", strtotime($orgDate));
                                                ?>
                                                 <tr>
                                                 <td><?php echo $row_cart["student_enrollment"] ?></td>
                                                 <td><?php  echo $row_cart['student_name'];?></td>
                                                 <td><?php echo $row_cart['student_sem']; ?></td>
-                                                <td><?php echo $row_cart["student_contact"] ?></td>
-                                                <td><?php echo $row_cart["student_email"] ?></td>
                                                 <td><?php echo $row_cart["books_name"] ?></td>
-                                                <td><?php echo $row_cart["books_issue_date"] ?></td>
+                                                <td><?php echo $newDate; ?></td>
                                                 <td><a href="return-books.php?book_id=<?php echo $row_cart["id"];?>" class="btn-delete">Return Book</a> </td>
                                                 </tr>
                                                 <?php 

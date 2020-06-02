@@ -6,11 +6,10 @@
      echo "<script>window.open('auth-login.php','_self')</script>";
  } 
  else{
-   
     include("includes/header.php");
-    include("includes/sidebar.php"); 
-    $admin_email=$_SESSION['admin_email'];
-    $paga=7;
+     include("includes/sidebar.php");
+     $admin_email=$_SESSION['admin_email'];
+    $paga=8;
     $query_per="select * from librarian_registration where email='$admin_email'";
     $run_query_per=mysqli_query($con,$query_per);
     while($row_query_per=mysqli_fetch_array($run_query_per))
@@ -21,12 +20,56 @@
     $subject=explode(",",$admin_permission);
     if(in_array($paga,$subject))
     {
-            ?>
-      
-            <!-- ========== Left Sidebar Start ========== -->
-    
+            $error_product="";
+            $errorresult=true;
+            if(isset($_POST['submit'])){
+                
+                if(empty($_POST['manufacturer_title']))
+                {
+                    $error_product="Required..";
+                    $errorresult=false;
+                }
+                else{
+                    $error_product="";
+                }
+                if($errorresult==false)
+                {
+                    goto end;
+                }
+                $manufacturer_title = $_POST['manufacturer_title'];
+
+                $insert_cat = "insert into category(cat_name,status) values('$manufacturer_title','yes')";
+                
+                $run_cat = mysqli_query($con,$insert_cat);
+                
+                if($run_cat){
+                    ?>
+            <script>
+                    swal({
+                        title: "Your New Category Has Been Inserted.",
+                        text: "",
+                        icon: "success",
+                        buttons: [,"OK"],
+                        successMode: true,
+                       
+                })
+                .then((willDelete) => {
+                        if (willDelete) {
+                            window.open('view-category.php','_self');
+                        } 
+                        else {
+                        }
+                });
+            </script>
+                   <?php  
+                }
+                
+            }
+            end:
+     ?>
 
 <div class="main-content">
+
 <div class="page-content">
     <div class="container-fluid">
 
@@ -34,7 +77,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="page-title-box d-flex align-items-center justify-content-between">
-                    <h4 class="mb-0 font-size-18">Messages</h4>
+                    <h4 class="mb-0 font-size-18">Add category</h4>   
                 </div>
             </div>
         </div>     
@@ -44,48 +87,14 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                       <form method="POST" action="" enctype="multipart/form-data"> 
-                       <div class="form-group row">
-                                <label for="example-search-input" class="col-md-3 col-form-label">Student Enrollment</label>
-                                <div class="col-md-9">
-                                <select class="form-control select2" name="student_enrollment" required>
-                              <?php 
-                              
-                              $get_accessories_manufacturerss = "select * from student_registration where status='yes'";
-                              $run_accessories_manufacturerss = mysqli_query($con,$get_accessories_manufacturerss);
-                              
-                              while ($row_accessories_manufacturerss=mysqli_fetch_array($run_accessories_manufacturerss)){
-                                  
-                           // $manufacturer_accessories_id=$row_accessories_manufacturers['accessories_brand_id'];
-                                  $manufacturer_accessories_titles = $row_accessories_manufacturerss['enrollment'];
-                                  
-                                  echo "
-                                  
-                                  <option value='$manufacturer_accessories_titles'> $manufacturer_accessories_titles </option>
-                                  
-                                  ";
-                                  
-                              }
-                              
-                              ?>
-                              
-                          </select>
-                                </div>
-                            </div>
+                       <form  class="custom-validation" method="POST" enctype="multipart/form-data"> 
                             <div class="form-group row">
-                                <label for="example-password-input" class="col-md-3 col-form-label">Title</label>
+                                <label for="example-text-input" class="col-md-3 col-form-label">Category Title</label>
                                 <div class="col-md-9">
-                                    <input class="form-control" type="text" placeholder="Title" id="example-password-input" name="title" required>
+                                    <input class="form-control" type="text" placeholder="Category Title" name="manufacturer_title"  id="example-text-input" required>
+                                    <span style="color: red;"><?php echo $error_product; ?></span>
                                 </div>
                             </div>
-                            <div class="form-group row">
-                                <label for="example-password-input" class="col-md-3 col-form-label">Messages</label>
-                                <div class="col-md-9">
-                                <textarea required class="form-control" placeholder="Messages" name="messages" cols="19" rows="6" > </textarea>
-                                </div>
-                            </div>
-                            
-                           
                             <div class="form-group mt-4">
                                 <div class="text-right">
                                     <button type="submit" class="btn btn-primary waves-effect waves-light mr-1" name="submit">
@@ -106,8 +115,6 @@
         <?php 
         include("includes/footer.php");
         ?>
-       
-
 
     </div>
 </div>
@@ -119,20 +126,15 @@
         <script src="assets/libs/simplebar/simplebar.min.js"></script>
         <script src="assets/libs/node-waves/waves.min.js"></script>
 
-         <!-- select 2 plugin -->
-         <script src="assets/libs/select2/js/select2.min.js"></script>
-        <script src="assets/js/pages/ecommerce-select2.init.js"></script>
+        <script src="assets/libs/parsleyjs/parsley.min.js"></script>
+
+        <script src="assets/js/pages/form-validation.init.js"></script>
         <!-- apexcharts -->
         <script src="assets/libs/apexcharts/apexcharts.min.js"></script>
 
         <script src="assets/js/pages/dashboard.init.js"></script>
-        
-        <script src="assets/js/tinymce/tinymce.min.js"></script>
-        <script>tinymce.init({ selector:'textarea'});</script>
 
         <script src="assets/js/app.js"></script>
-
-        
     </body>
 
 
@@ -156,7 +158,7 @@ $(document).ready(function(){
                 })
                 .then((willDelete) => {
                         if (willDelete) {
-                            window.open('messages.php','_self');
+                            window.open('add-category.php','_self');
                         } 
                         else
                         {
@@ -184,46 +186,7 @@ $(document).ready(function(){
  }, 1000)
 });
 </script>
-<?php 
-
-if(isset($_POST['submit'])){
-
-
-    $studnet_enrollment=$_POST['student_enrollment'];
-    $title=$_POST['title'];
-    $messages=$_POST['messages'];
-    $insert_product = "insert into messages(enrollment,title,msg,date,status) values('$studnet_enrollment','$title','$messages',NOW(),'yes')";
-    $run_product = mysqli_query($con,$insert_product);
-    
-    if($run_product){
-        ?>
-        <script>
-            swal({
-                title:"Your Messages send successful.",
-                text: "",
-                icon: "success",
-                buttons: [,"OK"],
-                successMode: true,
-               
-        })
-        .then((willDelete) => {
-                if (willDelete) {
-                    window.open('messages.php','_self');
-                } 
-                else {
-                }
-        });
-    </script>
-    
-    <?php     
-    }
-    
-}
-
-?>
-
-
-    <?php
+<?php
  }
 
 else{

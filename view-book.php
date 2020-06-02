@@ -55,7 +55,7 @@
                                                 <th>Name</th>
                                                 <th>Author Name</th>
                                                 <th>Publication Name</th>
-                                                <th>Purchase Date</th>
+                                                <th>Publication Date</th>
                                                 <th>Price</th>
                                                 <th>Status</th>
                                                 <th>Action</th>
@@ -69,6 +69,9 @@
                                               $select_cat="SELECT * FROM add_books ORDER BY id DESC";
                                               $run_cart=mysqli_query($con, $select_cat);
                                             while ($row_cart=mysqli_fetch_array($run_cart)) {
+                                                $date=$row_cart["books_publication_date"]; 
+                                                    $orgDate = $date;  
+                                                    $newDate = date("d-M-Y", strtotime($orgDate));
                                                ?>
                                                 <tr>
                                                 <td>
@@ -76,7 +79,7 @@
                                                 <td><?php echo $row_cart["books_name"] ?></td>
                                                 <td><?php  echo $row_cart['books_author_name'];?></td>
                                                 <td><?php echo $row_cart['books_publication_name']; ?></td>
-                                                <td><?php echo $row_cart["books_purchase_date"] ?></td>
+                                                <td><?php echo $newDate; ?></td>
                                                 <td><?php echo $row_cart["books_price"] ?></td>
                                                 <td>
                                                <?php 
@@ -234,9 +237,9 @@
                             url:"book-status.php",
                             method:"POST",
                             data:{book_ids:book_ids,book_idss:book_idss},
-                            success:function()
+                            success:function(success)
                             {
-
+                                window.open('view-book.php','_self')
                             }
                         });
                     });
